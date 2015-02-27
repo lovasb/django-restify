@@ -4,6 +4,11 @@ from restify.api import Api
 from restify.resource import Resource
 
 
+class CustomResource(Resource):
+    class Meta:
+        resource_name = 'example'
+
+
 class ApiTest(TestCase):
     def test_api_naming(self):
         api = Api()
@@ -18,6 +23,7 @@ class ApiTest(TestCase):
 
     def test_api_register_resource(self):
         api = Api()
-        api.register(r'first/$', Resource)
+        api.register(r'first/$', CustomResource)
         self.assertEqual(len(api.urls), 1)
         self.assertIsInstance(api.urls[0], RegexURLPattern)
+        self.assertEqual(api.urls[0].name, 'example')

@@ -30,6 +30,6 @@ class Api(object):
         pattern_list = []  # TODO: add default urls eg. root, documentation
 
         for endpoint, resource in self._registry.items():
-            pattern_list.append(url(endpoint, resource.as_callable(), name=resource.resource_name))
+            pattern_list.append(url(endpoint, resource.as_callable(), name=resource._meta.resource_name))
         urlpatterns = patterns('', *pattern_list)
         return urlpatterns
