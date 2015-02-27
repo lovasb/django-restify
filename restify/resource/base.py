@@ -103,7 +103,7 @@ class Resource(object, metaclass=ResourceMeta):
         resp = method(request, *args, **kwargs)
         if isinstance(resp, HttpResponseBase):
             return resp
-        return ApiResponse(resp, serializer=self._serializer)
+        return resp.to_django_response(serializer=self._meta.serializer)
 
     def common(self, request, *args, **kwargs):
         """

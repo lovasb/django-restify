@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.test import RequestFactory
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 
 from restify.resource import Resource
 from restify.http.response import ApiResponse
@@ -24,7 +24,7 @@ class Resource2(Resource):
 class Resource3(Resource):
     def get(self, request):
         data = {'asdf': 'asdf'}
-        return data
+        return ApiResponse(data)
 
 
 class ResourceTest(TestCase):
@@ -71,4 +71,4 @@ class ResourceTest(TestCase):
 
         request = self.rf.get('/')
         response = resource(request)
-        self.assertIsInstance(response, ApiResponse)
+        self.assertIsInstance(response, JsonResponse)

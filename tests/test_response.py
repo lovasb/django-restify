@@ -8,6 +8,7 @@ from restify import status
 class ApiResponseTest(TestCase):
     def test_serializaton(self):
         data = {'example': 'data'}
-        resp = ApiResponse(data, serializer=BaseSerializer)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.content, b'"{\\"example\\": \\"data\\"}"')
+        resp = ApiResponse(data)
+        self.assertEqual(resp._status_code, status.HTTP_200_OK)
+        django_resp = resp.to_django_response(serializer=BaseSerializer)
+        self.assertEqual(django_resp.content, b'{\"example\": \"data\"}')
