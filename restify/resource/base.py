@@ -7,7 +7,7 @@ from django.http.response import HttpResponseBase
 from django.utils.decorators import classonlymethod
 
 from restify import serializers
-from restify import status
+from restify.http import status
 from restify.http.response import ApiResponse
 
 logger = logging.getLogger('django.request')
@@ -17,6 +17,7 @@ class ResourceOptions:
     resource_name = None
     http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head']
     serializer = serializers.BaseSerializer
+    authentication = None
 
 
 class ResourceMeta(type):
@@ -50,6 +51,10 @@ class Resource(object, metaclass=ResourceMeta):
     @property
     def resource_name(self):
         return self._meta.resource_name
+
+    @property
+    def authentication(self):
+        return self._meta.authentication
 
     @classonlymethod
     def as_callable(cls, **initkwargs):
@@ -97,6 +102,12 @@ class Resource(object, metaclass=ResourceMeta):
         method = self.dispatch(request, *args, **kwargs)
         if method == self.http_method_not_allowed:
             return method(request, *args, **kwargs)
+
+        if self.authentication is not None:
+            auth = self.authentication()
+            if not auth.is_authenticated(request=request):
+                return auth.unauthorized()
+
         resp = self.common(request, *args, **kwargs)
         if isinstance(resp, HttpResponseBase):
             return resp

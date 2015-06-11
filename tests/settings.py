@@ -10,5 +10,7 @@ DATABASES = {
 MIDDLEWARE_CLASSES = ()
 
 INSTALLED_APPS=[
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
     'restify', 'tests',
 ]

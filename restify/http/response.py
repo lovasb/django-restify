@@ -2,7 +2,7 @@
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 
-from restify import status
+from restify.http import status
 
 
 class ApiResponse(object):
