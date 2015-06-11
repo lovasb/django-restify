@@ -18,6 +18,7 @@ class ResourceOptions:
     http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head']
     serializer = serializers.BaseSerializer
     authentication = None
+    authorization = None
 
 
 class ResourceMeta(type):
@@ -55,6 +56,10 @@ class Resource(object, metaclass=ResourceMeta):
     @property
     def authentication(self):
         return self._meta.authentication
+
+    @property
+    def authorization(self):
+        return self._meta.authorization
 
     @classonlymethod
     def as_callable(cls, **initkwargs):
@@ -107,6 +112,13 @@ class Resource(object, metaclass=ResourceMeta):
             auth = self.authentication()
             if not auth.is_authenticated(request=request):
                 return auth.unauthorized()
+
+        if self.authorization is not None:
+            if getattr(request, 'user', None) is None:
+                return self.authorization.unauthorized()
+
+            if not self.authorization.has_perm(request.user, http_method=request.method.lower()):
+                return self.authorization.unauthorized()
 
         resp = self.common(request, *args, **kwargs)
         if isinstance(resp, HttpResponseBase):
