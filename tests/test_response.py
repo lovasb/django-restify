@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from restify.http.response import ApiResponse
 from restify.serializers import BaseSerializer
-from restify import status
+from restify.http import status
 
 
 class ApiResponseTest(TestCase):
