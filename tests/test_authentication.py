@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, RequestFactory
 
-from restify.authentication import ApiKeyAuthentication
+from restify.authentication import ApiKeyAuthentication, DjangoAuthentication
 from restify.http import status
 from restify.models import ApiKey
 from restify.resource import Resource
@@ -88,3 +88,34 @@ class ApiAuthTest(TestCase):
         request = rf.get('/')
         response = resource(request)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class ResourceSession(Resource):
+    class Meta:
+        authentication = DjangoAuthentication
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('')
+
+
+class SessionAuthTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='user1', password='passwd1')
+
+    def test_no_user_with_user(self):
+        request = HttpRequest()
+        auth = DjangoAuthentication()
+
+        self.assertFalse(auth.is_authenticated(request))
+
+        request.user = self.user
+        self.assertTrue(auth.is_authenticated(request))
+
+    def test_resource_auth(self):
+        rf = RequestFactory()
+        resource = ResourceSession.as_callable()
+
+        request = rf.get('/')
+        request.user = self.user
+        response = resource(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
