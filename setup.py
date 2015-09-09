@@ -98,7 +98,7 @@ def find_package_data(
 
 
 setup(
-    name = 'django-restify',
+    name = 'django-restify-framework',
     version = version,
     description = "Yet another django REST API",
     long_description = open('README.md').read(),
