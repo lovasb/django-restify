@@ -11,7 +11,7 @@ class PostInBodyMiddleware(object):
     def _is_json_body_request(self, request):
         return request.POST.dict() == {} and\
                len(request.body) and\
-               request.META['CONTENT_TYPE'] == 'application/json'
+               request.META['CONTENT_TYPE'].startswith('application/json')
 
 
     def process_request(self, request):
