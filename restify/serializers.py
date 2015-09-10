@@ -1,4 +1,6 @@
 import datetime
+
+from django.core.paginator import Page
 from django.db import models
 from django.utils.encoding import force_text
 from django.conf import settings
@@ -30,11 +32,53 @@ class BaseSerializer(object):
             return data
         elif isinstance(data, (int, float)):
             return data
-        else:
-            return force_text(data)
+        elif hasattr(data, 'flatten'):
+            return data.flatten()
+
+        return force_text(data)
 
 
-class ModelSerializer(BaseSerializer):
+class DjangoSerializer(BaseSerializer):
+    def flatten(self, data):
+        if isinstance(data, Page):
+            retval = {
+                'current': data.number,
+                'num_pages': data.paginator.num_pages,
+                'list': []
+            }
+
+            # Previous page
+            previous = None
+            if data.has_previous():
+                number = data.previous_page_number()
+                previous = {
+                    'key': number,
+                    'value': number
+                }
+            retval['list'].append(previous)
+
+            # Current page must be at index #1 (because reply['pages']['current'] is initialized to 1)
+            retval['list'].append({
+                'key': data.number,
+                'value': data.number
+            })
+
+            # Next page
+            next = None
+            if data.has_next():
+                number = data.next_page_number()
+                next = {
+                    'key': number,
+                    'value': number
+                }
+            retval['list'].append(next)
+
+            return retval
+
+        return super().flatten(data)
+
+
+class ModelSerializer(DjangoSerializer):
     def flatten(self, data):
         if isinstance(data, (forms.ModelForm, forms.Form,)):
             retval = {}
@@ -55,4 +99,5 @@ class ModelSerializer(BaseSerializer):
                 else:
                     retval[field.name] = self.flatten(getattr(data, field.name))
             return retval
+
         return super(ModelSerializer, self).flatten(data)
