@@ -79,6 +79,9 @@ class DjangoSerializer(BaseSerializer):
 
 
 class ModelSerializer(DjangoSerializer):
+    def __init__(self, serialize_related_fields=True):
+        self._serialize_related_fields = serialize_related_fields
+
     def flatten(self, data):
         if isinstance(data, (forms.ModelForm, forms.Form,)):
             retval = {}
@@ -94,10 +97,14 @@ class ModelSerializer(DjangoSerializer):
         elif isinstance(data, models.Model):
             retval = {}
             for field in data._meta.fields:
+                if field.rel and self._serialize_related_fields == False:
+                    continue
+
                 if isinstance(field, models.ForeignKey):
                     retval[field.name] = getattr(data, '{0}_id'.format(field.name))
                 else:
                     retval[field.name] = self.flatten(getattr(data, field.name))
+
             return retval
 
         return super(ModelSerializer, self).flatten(data)

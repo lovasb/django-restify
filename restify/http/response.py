@@ -12,7 +12,10 @@ class ApiResponse(object):
         self._content_type = content_type
 
     def to_django_response(self, serializer):
-        serialized = serializer().flatten(self._data)
+        if isinstance(serializer, type):
+            serializer = serializer()
+
+        serialized = serializer.flatten(self._data)
         if self._content_type == 'application/json':
             resp = JsonResponse(serialized, encoder=DjangoJSONEncoder, safe=False)
             resp.status_code = self._status_code
