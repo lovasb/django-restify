@@ -9,7 +9,8 @@ Welcome to django-restify's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   serializers
+   :maxdepth: 1
 
 
 

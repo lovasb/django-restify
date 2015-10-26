@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db.models.loading import get_model
+from django.apps.registry import apps
 
 from restify.authentication.base import Authentication
 from restify.models import ApiKey
@@ -15,8 +15,9 @@ class ApiKeyAuthentication(Authentication):
             auth_type, data = authorization.split()
             username, api_key = data.split(':', 1)
         else:
-            username = request.GET.get('username') or request.POST.get('username')
-            api_key = request.GET.get('api_key') or request.POST.get('api_key')
+            data = getattr(request, request.method, 'GET')
+            username = data.get('username')
+            api_key = data.get('api_key')
 
         return username, api_key
 
@@ -46,7 +47,7 @@ class ApiKeyAuthentication(Authentication):
         if not username or not api_key:
             return False
 
-        kls = get_model(settings.AUTH_USER_MODEL)
+        kls = apps.get_model(settings.AUTH_USER_MODEL)
         username_field = kls.USERNAME_FIELD
 
         try:

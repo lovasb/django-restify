@@ -1,5 +1,8 @@
+from django.shortcuts import get_object_or_404
+
 from restify import serializers
 from restify.resource.base import Resource, ResourceOptions, ResourceMeta
+from restify.http.response import ApiResponse
 
 
 class ModelResourceOptions(ResourceOptions):
@@ -7,6 +10,8 @@ class ModelResourceOptions(ResourceOptions):
     model = None
     form_class = None
     queryset = None
+    fields = []
+    exclude = []
 
 
 class ModelResourceMeta(ResourceMeta):
@@ -20,6 +25,10 @@ class ModelResourceMixin(object):
         if self._meta.model is not None:
             return self._meta.model._default_manager.all()
 
+        raise NotImplementedError
+
 
 class ModelResource(Resource, ModelResourceMixin, metaclass=ModelResourceMeta):
-    pass
+    def get(self, request, pk):
+        obj = get_object_or_404(self.get_queryset(), pk=pk)
+        return ApiResponse(obj)

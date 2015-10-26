@@ -32,6 +32,7 @@ import shlex
 # ones.
 extensions = [
     'sphinx.ext.pngmath',
+    'sphinx.ext.doctest',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -357,3 +358,20 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+
+########## Doctest
+import os
+import sys
+import django
+
+
+def setUp():
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    django.setup()
+    from django.core import management
+    management.call_command('syncdb', interactive=False)
+
+
+doctest_global_setup = setUp()

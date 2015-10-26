@@ -26,6 +26,7 @@ class ApiAuthTest(TestCase):
     def test_is_authenticated_get_params(self):
         auth = ApiKeyAuthentication()
         request = HttpRequest()
+        request.method = 'GET'
 
         # No username/api_key details should fail.
         self.assertFalse(auth.is_authenticated(request))
@@ -51,6 +52,7 @@ class ApiAuthTest(TestCase):
     def test_is_authenticated_header(self):
         auth = ApiKeyAuthentication()
         request = HttpRequest()
+        request.method = 'GET'
 
         # Wrong username details.
         request.META['HTTP_AUTHORIZATION'] = 'foo'
@@ -75,6 +77,7 @@ class ApiAuthTest(TestCase):
     def test_check_active_true(self):
         auth = ApiKeyAuthentication()
         request = HttpRequest()
+        request.method = 'GET'
 
         self.user.is_active = False
         self.user.save()

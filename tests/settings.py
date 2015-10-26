@@ -3,7 +3,7 @@ SECRET_KEY = 'verysecret'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'restify.db',
+        'NAME': ':memory:',
     }
 }
 

@@ -1,5 +1,6 @@
 import datetime
 
+import six
 from django.core.paginator import Page
 from django.db import models
 from django.utils.encoding import force_text
@@ -10,13 +11,15 @@ from django import forms
 class BaseSerializer(object):
     formats = ['json']
 
-    def __init__(self, datetime_formatting=None):
+    def __init__(self, datetime_formatting=None, fields=None):
+        self._fields = fields
+
         if datetime_formatting is not None:
             self.datetime_formatting = datetime_formatting
         else:
             self.datetime_formatting = getattr(settings, 'RESTIFY_DATETIME_FORMATTING', 'rfc-2822')
 
-    def flatten(self, data):
+    def flatten(self, data, fields=None):
         """
         For a piece of data, attempts to recognize it and provide a simplified
         form of something complex.
@@ -24,14 +27,27 @@ class BaseSerializer(object):
         This brings complex Python data structures down to native types of the
         serialization format(s).
         """
+        if fields is None and self._fields is not None:
+            fields = self._fields
+
         if isinstance(data, (list, tuple)):
-            return [self.flatten(item) for item in data]
+            return [self.flatten(item, fields=fields) for item in data]
         elif isinstance(data, dict):
-            return dict((key, self.flatten(val)) for (key, val) in data.items())
+            return dict((key, self.flatten(val, fields=fields)) for (key, val) in data.items())
         elif isinstance(data, (datetime.datetime, datetime.date)):
             return data
         elif isinstance(data, (int, float)):
             return data
+        elif fields:
+            retval = dict()
+            for field in fields:
+                if isinstance(field, six.string_types):
+                    val = getattr(data, field)
+                    retval[field] = self.flatten(val, fields=[])
+                elif isinstance(field, (tuple, list)):
+                    val = getattr(data, field[0])
+                    retval[field[0]] = self.flatten(val, fields=field[1])
+            return retval
         elif hasattr(data, 'flatten'):
             return data.flatten()
 
@@ -39,7 +55,7 @@ class BaseSerializer(object):
 
 
 class DjangoSerializer(BaseSerializer):
-    def flatten(self, data):
+    def flatten(self, data, fields=None):
         if isinstance(data, Page):
             retval = {
                 'current': data.number,
@@ -75,14 +91,14 @@ class DjangoSerializer(BaseSerializer):
 
             return retval
 
-        return super().flatten(data)
+        return super().flatten(data, fields=fields)
 
 
 class ModelSerializer(DjangoSerializer):
-    def __init__(self, serialize_related_fields=True):
-        self._serialize_related_fields = serialize_related_fields
+    def flatten(self, data, fields=None):
+        if fields is None and self._fields is not None:
+            fields = self._fields
 
-    def flatten(self, data):
         if isinstance(data, (forms.ModelForm, forms.Form,)):
             retval = {}
             if data.is_valid() or not data.is_bound:
@@ -94,17 +110,20 @@ class ModelSerializer(DjangoSerializer):
             else:
                 retval = {key: list(value) for key, value in data.errors.items()}
             return retval
+
         elif isinstance(data, models.Model):
-            retval = {}
-            for field in data._meta.fields:
-                if field.rel and self._serialize_related_fields == False:
-                    continue
+            if fields is None:
+                fields = [field.name for field in data._meta.fields]
 
-                if isinstance(field, models.ForeignKey):
-                    retval[field.name] = getattr(data, '{0}_id'.format(field.name))
-                else:
-                    retval[field.name] = self.flatten(getattr(data, field.name))
+            if data._meta.pk.name not in fields:
+                fields = tuple(fields) + (data._meta.pk.name,)
 
-            return retval
+            return super().flatten(data, fields)
 
-        return super(ModelSerializer, self).flatten(data)
+        elif hasattr(data, 'through') and hasattr(data, 'all'): #m2m relation
+            return super().flatten(list(data.all()), fields)
+
+        elif isinstance(data, models.QuerySet):
+            return super().flatten(list(data), fields)
+
+        return super().flatten(data, fields=fields)
