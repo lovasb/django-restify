@@ -1,5 +1,6 @@
 import django
-if django.VERSION > (1, 7):
+
+if django.VERSION >= (1, 8):
     from django.forms import modelform_factory
 else:
     from django.forms.models import modelform_factory
