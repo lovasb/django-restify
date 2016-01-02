@@ -54,9 +54,12 @@ class LiveApiTestCase(LiveServerTestCase, ApiTestMixin):
     RESOURCE = None
 
     def _get_response(self, method_name, url, data=None):
-        client = Client()
-        method = getattr(client, method_name)
-        return method(url, data, content_type='application/json')
+        method = getattr(self.client, method_name)
+
+        if method_name in ('post', 'put', 'POST', 'PUT'):
+            data = json.dumps(data)
+
+        return method(url, data=data, content_type='application/json; charset=utf-8')
 
     def get(self, data=None, **kwargs):
         reverse_name = "api:{}".format(self.RESOURCE.Meta.resource_name)
@@ -64,7 +67,7 @@ class LiveApiTestCase(LiveServerTestCase, ApiTestMixin):
         resp = self._get_response('get', url=url, data=data)
         return self._parse_response(resp)
 
-    def post(self, data=None, **kwargs):
+    def post(self, data=None, content_type='application/json', **kwargs):
         reverse_name = "api:{}".format(self.RESOURCE.Meta.resource_name)
         url = reverse(reverse_name, kwargs=kwargs)
         resp = self._get_response('post', url=url, data=data)

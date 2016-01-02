@@ -8,9 +8,7 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = (
-    'restify.middleware.PostInBodyMiddleware',
-)
+MIDDLEWARE_CLASSES = ()
 
 INSTALLED_APPS=[
     'django.contrib.contenttypes',
