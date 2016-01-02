@@ -46,7 +46,7 @@ class Resource(object, metaclass=ResourceMeta):
             setattr(self, key, value)
 
     @property
-    def _serializer(self):
+    def serializer(self):
         return self._meta.serializer
 
     @property
@@ -126,7 +126,7 @@ class Resource(object, metaclass=ResourceMeta):
         resp = method(request, *args, **kwargs)
         if isinstance(resp, HttpResponseBase):
             return resp
-        return resp.to_django_response(serializer=self._meta.serializer)
+        return resp.to_django_response(serializer=self.serializer)
 
     def common(self, request, *args, **kwargs):
         """

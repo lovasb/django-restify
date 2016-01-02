@@ -1,3 +1,4 @@
+DEBUG = True
 SECRET_KEY = 'verysecret'
 
 DATABASES = {
@@ -7,10 +8,14 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = ()
+MIDDLEWARE_CLASSES = (
+    'restify.middleware.PostInBodyMiddleware',
+)
 
 INSTALLED_APPS=[
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'restify', 'tests',
 ]
+
+ROOT_URLCONF = 'tests.urls'

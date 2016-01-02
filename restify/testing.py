@@ -1,11 +1,19 @@
 import json
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, LiveServerTestCase, RequestFactory, Client
 from restify.authentication import ApiKeyAuthentication
 
 
-class RestApiTestCase(TestCase):
+class ApiTestMixin(object):
+    def _parse_response(self, response):
+        if response['Content-Type'] == 'application/json':
+            response.json = json.loads(response.content.decode('utf8'))
+
+        return response
+
+
+class ApiTestCase(TestCase, ApiTestMixin):
     RESOURCE = None
 
     def _set_auth_data(self, request, **kwargs):
@@ -33,13 +41,37 @@ class RestApiTestCase(TestCase):
         resource.request = request
         resp = resource(request, **extra)
 
-        if resp['Content-Type'] == 'application/json':
-            resp.json = json.loads(resp.content.decode('utf8'))
-
-        return resp
+        return self._parse_response(resp)
 
     def post(self, data, user=None, **extra):
         return self._get_response('post', data, user, **extra)
 
     def get(self, query={}, user=None, **extra):
         return self._get_response('get', data=query, user=user, **extra)
+
+
+class LiveApiTestCase(LiveServerTestCase, ApiTestMixin):
+    RESOURCE = None
+
+    def _get_response(self, method_name, url, data=None):
+        client = Client()
+        method = getattr(client, method_name)
+        return method(url, data, content_type='application/json')
+
+    def get(self, data=None, **kwargs):
+        reverse_name = "api:{}".format(self.RESOURCE.Meta.resource_name)
+        url = reverse(reverse_name, kwargs=kwargs)
+        resp = self._get_response('get', url=url, data=data)
+        return self._parse_response(resp)
+
+    def post(self, data=None, **kwargs):
+        reverse_name = "api:{}".format(self.RESOURCE.Meta.resource_name)
+        url = reverse(reverse_name, kwargs=kwargs)
+        resp = self._get_response('post', url=url, data=data)
+        return self._parse_response(resp)
+
+    def put(self, data=None, **kwargs):
+        reverse_name = "api:{}".format(self.RESOURCE.Meta.resource_name)
+        url = reverse(reverse_name, kwargs=kwargs)
+        resp = self._get_response('put', url=url, data=json.dumps(data))
+        return self._parse_response(resp)

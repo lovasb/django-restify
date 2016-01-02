@@ -9,9 +9,8 @@ from restify.http import status
 
 class PostInBodyMiddleware(object):
     def _is_json_body_request(self, request):
-        return request.POST.dict() == {} and\
-               len(request.body) and\
-               request.META['CONTENT_TYPE'].startswith('application/json')
+        return len(request.body) and\
+               'application/json' in request.META['CONTENT_TYPE']
 
 
     def process_request(self, request):
