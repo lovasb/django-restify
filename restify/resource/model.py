@@ -1,5 +1,10 @@
+import django
+if django.VERSION >= (1, 7):
+    from django.forms import modelform_factory
+else:
+    from django.forms.models import modelform_factory
+
 from django.db.models.fields import related
-from django.forms import modelform_factory
 from django.shortcuts import get_object_or_404
 
 from restify import serializers
