@@ -51,7 +51,7 @@ class ModelResource(Resource, ModelResourceMixin, metaclass=ModelResourceMeta):
     @property
     def serializer(self):
         if isinstance(self._meta.serializer, type):
-            field_names = self.get_fields_for_model(self.get_queryset().model)
+            field_names = self._get_fields_for_model(self.get_queryset().model)
             self._meta.serializer = self._meta.serializer(fields=field_names)
 
         return self._meta.serializer
