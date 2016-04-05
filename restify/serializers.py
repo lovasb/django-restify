@@ -38,6 +38,8 @@ class BaseSerializer(object):
             return data
         elif isinstance(data, (int, float)):
             return data
+        elif data is None:
+            return data
         elif fields:
             retval = dict()
             for field in fields:

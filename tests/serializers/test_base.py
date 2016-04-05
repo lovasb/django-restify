@@ -43,6 +43,13 @@ class BaseSerializerTest(TestCase):
 
         self.assertSequenceEqual(simple, str(obj))
 
+    def test_serialize_None(self):
+        """None is flatten to None"""
+        obj = {'test_value': None}
+        simple = self.serializer.flatten(obj)
+
+        self.assertSequenceEqual(simple, obj)
+
     def test_serialize_with_fields(self):
         obj = NoFlattenStructure()
         serializer = BaseSerializer(fields=['value1'])
