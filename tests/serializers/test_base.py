@@ -1,6 +1,7 @@
 import datetime
 import random
 
+import pytz
 from django.test import TestCase
 from restify.serializers import BaseSerializer
 
@@ -66,7 +67,7 @@ class BaseSerializerTest(TestCase):
 
         simple = {
             'value1': obj.value1,
-            'value2': obj.value2,
+            'value2': obj.value2.strftime('%Y-%m-%d %H:%M:%S%z'),
             'value3': [
                 {
                     'value1': obj.value3[0].value1
@@ -87,7 +88,7 @@ class BaseSerializerTest(TestCase):
 
         simple = {
             'value1': obj.value1,
-            'value2': obj.value2,
+            'value2': obj.value2.strftime('%Y-%m-%d %H:%M:%S%z'),
             'value3': [
                 {
                     'value1': obj.value3[0].value1,
@@ -101,3 +102,30 @@ class BaseSerializerTest(TestCase):
         }
 
         self.assertEqual(simple, serializer.flatten(obj))
+
+    def test_serialize_datetime(self):
+        serializer = BaseSerializer(fields=['datetime', 'datetime2'])
+
+        budapest = pytz.timezone('Europe/Amsterdam')
+        obj = {
+            'datetime': datetime.datetime.now(tz=budapest),
+        }
+        obj['datetime2'] = obj['datetime']
+        obj['datetime2'] = obj['datetime2'].replace(tzinfo=None)
+
+        self.assertIsInstance(serializer.flatten(obj)['datetime'], str)
+        self.assertEquals(serializer.flatten(obj)['datetime'],
+                          obj['datetime'].strftime('%Y-%m-%d %H:%M:%S%z'))
+        self.assertEquals(serializer.flatten(obj)['datetime2'],
+                          obj['datetime'].strftime('%Y-%m-%d %H:%M:%S'))
+
+    def test_override_datetime_format(self):
+        with self.settings(RESTIFY_DATETIME_FORMATTING='%Y-%m-%d'):
+            serializer = BaseSerializer(fields=['datetime'])
+            budapest = pytz.timezone('Europe/Amsterdam')
+            obj = {
+                'datetime': datetime.datetime.now(tz=budapest),
+            }
+
+            self.assertEquals(serializer.flatten(obj)['datetime'],
+                              obj['datetime'].strftime('%Y-%m-%d'))

@@ -17,7 +17,7 @@ class BaseSerializer(object):
         if datetime_formatting is not None:
             self.datetime_formatting = datetime_formatting
         else:
-            self.datetime_formatting = getattr(settings, 'RESTIFY_DATETIME_FORMATTING', 'rfc-2822')
+            self.datetime_formatting = getattr(settings, 'RESTIFY_DATETIME_FORMATTING', '%Y-%m-%d %H:%M:%S%z')
 
     def flatten(self, data, fields=None):
         """
@@ -35,7 +35,7 @@ class BaseSerializer(object):
         elif isinstance(data, dict):
             return dict((key, self.flatten(val, fields=fields)) for (key, val) in data.items())
         elif isinstance(data, (datetime.datetime, datetime.date)):
-            return data
+            return data.strftime(self.datetime_formatting)
         elif isinstance(data, (int, float)):
             return data
         elif data is None:

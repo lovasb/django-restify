@@ -1,3 +1,6 @@
 setuptools
 django
 six
+
+## For testing
+pytz
