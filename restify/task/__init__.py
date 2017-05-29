@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import Callable
+from typing import Callable, Dict
 
 
 def fullname(cls: type):
@@ -50,14 +50,31 @@ class TaskRegistry:
                 raise TypeError('Failed to call {0}()'.format(name)) from e
 
     def __call__(self, *args, **kwargs):
-        def decorator(f, *a, **k):
-            self.add(f, *a, **k)
+        def decorator(f):
+            self.add(f, *args, **kwargs)
             return f
 
-        if args:
-            return decorator(args[0])
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            self.add(args[0])
+
+            return args[0]
         else:
             return decorator
+
+    def dispatch_remote_call(self, structure: Dict):
+        return self.call(
+            structure['function'],
+            *structure.get('args', ()),
+            **structure.get('kwargs', {})
+        )
+
+    @classmethod
+    def prepare_remote_call(cls, name: str, *args, **kwargs):
+        return {
+            'function': name,
+            'args': args,
+            'kwargs': kwargs
+        }
 
 
 api_task = TaskRegistry()
