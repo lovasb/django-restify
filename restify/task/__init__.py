@@ -68,13 +68,5 @@ class TaskRegistry:
             **structure.get('kwargs', {})
         )
 
-    @classmethod
-    def prepare_remote_call(cls, name: str, *args, **kwargs):
-        return {
-            'function': name,
-            'args': args,
-            'kwargs': kwargs
-        }
-
 
 api_task = TaskRegistry()
