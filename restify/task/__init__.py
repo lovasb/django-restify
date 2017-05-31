@@ -33,7 +33,7 @@ class TaskRegistry:
     def remove(self, f: Callable):
         name = fullname(f)
 
-        del self._registry[name]
+        self.remove_by_name(name)
 
     def remove_by_name(self, name: str):
         del self._registry[name]
@@ -67,14 +67,6 @@ class TaskRegistry:
             *structure.get('args', ()),
             **structure.get('kwargs', {})
         )
-
-    @classmethod
-    def prepare_remote_call(cls, name: str, *args, **kwargs):
-        return {
-            'function': name,
-            'args': args,
-            'kwargs': kwargs
-        }
 
 
 api_task = TaskRegistry()

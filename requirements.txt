@@ -1,6 +1,7 @@
 setuptools
 django
 six
+requests>=2.10.0
 
 ## For testing
 pytz
