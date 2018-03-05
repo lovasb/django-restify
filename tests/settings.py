@@ -8,7 +8,7 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = ()
+MIDDLEWARE = ()
 
 INSTALLED_APPS=[
     'django.contrib.contenttypes',

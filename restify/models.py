@@ -10,12 +10,11 @@ except ImportError:
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-from .remote import CustomMetaModel
 
 
 @python_2_unicode_compatible
 class ApiKey(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='api_key')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, models.CASCADE, related_name='api_key')
     key = models.CharField(max_length=128, blank=True, default='', db_index=True)
     created = models.DateTimeField(auto_now_add=True)
 

@@ -55,7 +55,7 @@ class ModelResourceTest(LiveApiTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, data)
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE=(
         'restify.middleware.PostInBodyMiddleware',
     ))
     def test_create_object(self):
@@ -73,7 +73,7 @@ class ModelResourceTest(LiveApiTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Person.objects.count(), count + 1)
 
-    @override_settings(MIDDLEWARE_CLASSES=(
+    @override_settings(MIDDLEWARE=(
         'restify.middleware.PostInBodyMiddleware',
     ))
     def test_create_invalid(self):

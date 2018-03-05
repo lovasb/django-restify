@@ -1,5 +1,5 @@
 setuptools
-django
+django>=2.0
 six
 requests>=2.10.0
 

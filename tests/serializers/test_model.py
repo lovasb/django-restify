@@ -11,9 +11,9 @@ class Related(models.Model):
 class Model1(models.Model):
     a = models.CharField(max_length=100)
     b = models.PositiveIntegerField(default=10)
-    c = models.ForeignKey(Related, related_name='relmodel')
+    c = models.ForeignKey(Related, related_name='relmodel', on_delete=models.CASCADE)
     d = models.ManyToManyField(Related, related_name='relmodelm2m')
-    e = models.OneToOneField(Related, related_name='relone')
+    e = models.OneToOneField(Related, related_name='relone', on_delete=models.CASCADE)
 
 
 class ModelSerializerTestCase(TestCase):
