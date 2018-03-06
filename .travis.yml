@@ -2,5 +2,5 @@ language: python
 python:
   - 3.5
 install:
-  - pip install "django<2.0" "six<=1.10.0" "requests<=2.17.3" pytz
+  - pip install "django>=2.0" "six>=1.10.0" "requests>=2.10.0" pytz
 script: python runtests.py
