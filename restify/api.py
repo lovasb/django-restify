@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from django.conf.urls import url, patterns, include
+from django.conf.urls import url, include
 
 
 class Api(object):
@@ -31,5 +31,4 @@ class Api(object):
 
         for endpoint, resource in self._registry.items():
             pattern_list.append(url(endpoint, resource.as_callable(), name=resource._meta.resource_name))
-        urlpatterns = patterns('', *pattern_list)
-        return urlpatterns
+        return pattern_list

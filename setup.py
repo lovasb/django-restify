@@ -4,7 +4,7 @@ from distutils.util import convert_path
 from fnmatch import fnmatchcase
 from setuptools import setup, find_packages
 
-version = '0.32'
+version = '0.33'
 
 # Provided as an attribute, so you can append to these instead
 # of replicating them:
@@ -119,5 +119,5 @@ setup(
     package_data = find_package_data("restify", only_in_packages = False),
     include_package_data = True,
     zip_safe = False,
-    install_requires = ['setuptools', 'django', 'six', 'requests>=2.10.0'],
+    install_requires = ['setuptools', 'django<2.0', 'six<=1.10.0', 'requests<=2.17.3'],
 )
