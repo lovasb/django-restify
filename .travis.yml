@@ -1,8 +1,6 @@
 language: python
 python:
   - 3.5
-env:
-  - DJANGO="django<2.0"
 install:
-  - pip install -q $DJANGO && pip install six
+  - pip install -q django<2.0 six<=1.10.0 requests<=2.17.3 pytz
 script: python runtests.py
