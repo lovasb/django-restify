@@ -34,4 +34,4 @@ class Api(object):
 
         for endpoint, resource in self._registry.items():
             pattern_list.append(url(endpoint, resource.as_callable(), name=resource._meta.resource_name))
-        return pattern_list, self.app_name
+        return pattern_list
