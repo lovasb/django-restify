@@ -119,5 +119,5 @@ setup(
     package_data = find_package_data("restify", only_in_packages = False),
     include_package_data = True,
     zip_safe = False,
-    install_requires = ['setuptools', 'django<2.0', 'six<=1.10.0', 'requests<=2.17.3'],
+    install_requires = ['setuptools', 'django>=2.0', 'six>=1.10.0', 'requests>=2.10.0'],
 )
