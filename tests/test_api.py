@@ -1,5 +1,6 @@
-from django.core.urlresolvers import RegexURLPattern
 from django.test import TestCase
+from django.urls import URLPattern
+
 from restify.api import Api
 from restify.resource import Resource
 
@@ -25,5 +26,5 @@ class ApiTest(TestCase):
         api = Api()
         api.register(r'first/$', CustomResource)
         self.assertEqual(len(api.urls), 1)
-        self.assertIsInstance(api.urls[0], RegexURLPattern)
+        self.assertIsInstance(api.urls[0], URLPattern)
         self.assertEqual(api.urls[0].name, 'example')

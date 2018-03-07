@@ -22,7 +22,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     age = models.PositiveIntegerField(default=10)
-    instrument = models.ForeignKey(Instrument, blank=True, null=True)
+    instrument = models.ForeignKey(Instrument, models.CASCADE, blank=True, null=True)
 
     objects = TestManager()
 

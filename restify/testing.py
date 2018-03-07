@@ -1,7 +1,8 @@
 import json
 
-from django.core.urlresolvers import reverse
-from django.test import TestCase, LiveServerTestCase, RequestFactory, Client
+from django.test import TestCase, LiveServerTestCase, RequestFactory
+from django.urls import reverse
+
 from restify.authentication import ApiKeyAuthentication
 
 
