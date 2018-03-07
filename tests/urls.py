@@ -8,5 +8,5 @@ api.register(regex='person/(?P<pk>\d+|new)/$', resource=PersonResource)
 api.register(regex='persons/$', resource=PersonSetResource)
 
 urlpatterns = [
-    url(r'^api/', include(api.urls, namespace='api')),
+    url(r'^api/', include((api.urls, 'api'), namespace='api')),
 ]

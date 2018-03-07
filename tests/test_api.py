@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.test import TestCase
 from django.urls import URLPattern
 
@@ -20,18 +19,12 @@ class ApiTest(TestCase):
 
     def test_api_urls_empty(self):
         api = Api()
-        urls, app_name = api.urls
-        self.assertEqual(app_name, apps.get_app_config('restify').name)
-
-        self.assertEqual(len(urls), 0)
-        self.assertIsInstance(urls, list)
+        self.assertEqual(len(api.urls), 0)
+        self.assertIsInstance(api.urls, list)
 
     def test_api_register_resource(self):
         api = Api()
         api.register(r'first/$', CustomResource)
-        urls, app_name = api.urls
-        self.assertEqual(app_name, apps.get_app_config('restify').name)
-
-        url, = urls
-        self.assertIsInstance(url, URLPattern)
-        self.assertEqual(url.name, 'example')
+        self.assertEqual(len(api.urls), 1)
+        self.assertIsInstance(api.urls[0], URLPattern)
+        self.assertEqual(api.urls[0].name, 'example')
